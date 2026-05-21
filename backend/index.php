@@ -15,8 +15,21 @@ require_once __DIR__ . '/middleware/AuthMiddleware.php';
 
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 $method = $_SERVER['REQUEST_METHOD'];
-$base = '/sistema de quiz online/backend';
-$route = str_replace($base, '', $uri);
+$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+$base = rtrim(str_replace('/index.php', '', $scriptName), '/');
+$route = $uri;
+
+if ($base !== '' && str_starts_with($route, $base)) {
+    $route = substr($route, strlen($base));
+}
+
+if (str_starts_with($route, '/index.php')) {
+    $route = substr($route, strlen('/index.php'));
+}
+
+if ($route === '') {
+    $route = '/';
+}
 
 try {
     if ($route === '/api/auth/register' && $method === 'POST') {
@@ -25,6 +38,18 @@ try {
 
     if ($route === '/api/auth/login' && $method === 'POST') {
         AuthController::login();
+    }
+
+    if ($route === '/api/auth/admin-login' && $method === 'POST') {
+        AuthController::adminLogin();
+    }
+
+    if ($route === '/api/auth/forgot-password' && $method === 'POST') {
+        AuthController::forgotPassword();
+    }
+
+    if ($route === '/api/auth/reset-password' && $method === 'POST') {
+        AuthController::resetPassword();
     }
 
     if ($route === '/api/quizzes' && $method === 'GET') {

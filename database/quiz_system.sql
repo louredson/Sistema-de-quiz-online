@@ -4,6 +4,7 @@ USE quiz_system;
 DROP TABLE IF EXISTS quiz_attempts;
 DROP TABLE IF EXISTS quiz_options;
 DROP TABLE IF EXISTS quiz_questions;
+DROP TABLE IF EXISTS password_resets;
 DROP TABLE IF EXISTS quizzes;
 DROP TABLE IF EXISTS users;
 
@@ -53,6 +54,14 @@ CREATE TABLE quiz_attempts (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE password_resets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(150) NOT NULL,
+  token VARCHAR(64) NOT NULL UNIQUE,
+  expires_at DATETIME NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO users (name, email, password_hash, role) VALUES

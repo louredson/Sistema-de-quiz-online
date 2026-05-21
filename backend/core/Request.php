@@ -10,8 +10,12 @@ class Request
 
     public static function bearerToken(): ?string
     {
-        $headers = getallheaders();
+        $headers = function_exists('getallheaders') ? getallheaders() : [];
         $auth = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+        $auth = $auth
+            ?? ($_SERVER['HTTP_AUTHORIZATION'] ?? null)
+            ?? ($_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? null);
+
         if (!$auth || stripos($auth, 'Bearer ') !== 0) {
             return null;
         }

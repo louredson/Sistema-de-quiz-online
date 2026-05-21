@@ -7,7 +7,10 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   login(data: any) { return this.http.post<any>(`${this.base}/auth/login`, data); }
+  adminLogin(data: any) { return this.http.post<any>(`${this.base}/auth/admin-login`, data); }
   register(data: any) { return this.http.post<any>(`${this.base}/auth/register`, data); }
+  forgotPassword(data: any) { return this.http.post<any>(`${this.base}/auth/forgot-password`, data); }
+  resetPassword(data: any) { return this.http.post<any>(`${this.base}/auth/reset-password`, data); }
   quizzes() { return this.http.get<any>(`${this.base}/quizzes`); }
   quiz(id: number) { return this.http.get<any>(`${this.base}/quizzes/${id}`); }
   submit(id: number, answers: any) { return this.http.post<any>(`${this.base}/quizzes/${id}/submit`, { answers }); }

@@ -6,13 +6,18 @@ import { ProfilePageComponent } from './pages/profile-page.component';
 import { RankingPageComponent } from './pages/ranking-page.component';
 import { CreateQuizPageComponent } from './pages/create-quiz-page.component';
 import { AdminPageComponent } from './pages/admin-page.component';
+import { AdminLoginPageComponent } from './pages/admin-login-page.component';
+import { ForgotPasswordPageComponent } from './pages/forgot-password-page.component';
+import { adminGuard, authGuard } from './core/route.guards';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'login', component: LoginPageComponent },
+  { path: 'admin-login', component: AdminLoginPageComponent },
   { path: 'register', component: RegisterPageComponent },
-  { path: 'profile', component: ProfilePageComponent },
-  { path: 'ranking', component: RankingPageComponent },
-  { path: 'create-quiz', component: CreateQuizPageComponent },
-  { path: 'admin', component: AdminPageComponent },
+  { path: 'forgot-password', component: ForgotPasswordPageComponent },
+  { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
+  { path: 'ranking', component: RankingPageComponent, canActivate: [authGuard] },
+  { path: 'create-quiz', component: CreateQuizPageComponent, canActivate: [authGuard] },
+  { path: 'admin', component: AdminPageComponent, canActivate: [adminGuard] },
 ];
