@@ -12,6 +12,13 @@ import { ToastService } from '../core/toast.service';
     <section class="auth-shell page-enter">
       <div class="auth-frame">
         <article class="auth-hero hero-card">
+          <a routerLink="/" class="auth-brand-link">
+            <span class="brand-mark">QV</span>
+            <span class="brand-copy">
+              <strong>QuizVerse</strong>
+              <span>Back to home</span>
+            </span>
+          </a>
           <span class="inline-tag">Password recovery</span>
           <h1 class="hero-title">Recupera a conta em dois passos.</h1>
           <p class="hero-copy">Enquanto o envio por email nao esta ligado, o token de recuperacao aparece no proprio ecran para desenvolvimento.</p>
@@ -23,6 +30,13 @@ import { ToastService } from '../core/toast.service';
         </article>
 
         <article class="auth-panel">
+          <a routerLink="/" class="auth-brand-link">
+            <span class="brand-mark">QV</span>
+            <span class="brand-copy">
+              <strong>QuizVerse</strong>
+              <span>Pagina inicial</span>
+            </span>
+          </a>
           <span class="eyebrow">Recuperacao</span>
           <h2>Redefinir senha</h2>
           <div class="form-stack">
@@ -40,16 +54,21 @@ import { ToastService } from '../core/toast.service';
               <label class="field-label">Token</label>
               <input [(ngModel)]="token" placeholder="Cole o token aqui">
             </div>
-            <div>
+            <div class="password-field">
               <label class="field-label">Nova password</label>
-              <input [(ngModel)]="password" type="password" placeholder="Nova password">
+              <input [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'" placeholder="Nova password">
+              <button class="eye-button" type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+                <svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"></path>
+                  <circle cx="12" cy="12" r="3.2"></circle>
+                </svg>
+              </button>
             </div>
             <button class="primary-button" type="button" (click)="resetPassword()">Atualizar password</button>
             <p class="error-text" *ngIf="error">{{ error }}</p>
           </div>
           <div class="form-links">
             <a routerLink="/login">Entrar como utilizador</a>
-            <a routerLink="/admin-login">Entrar como admin</a>
           </div>
         </article>
       </div>
@@ -63,6 +82,7 @@ export class ForgotPasswordPageComponent {
   tokenPreview = '';
   message = '';
   error = '';
+  showPassword = false;
   private readonly api = inject(ApiService);
   private readonly toast = inject(ToastService);
 

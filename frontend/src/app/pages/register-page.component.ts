@@ -12,6 +12,13 @@ import { ToastService } from '../core/toast.service';
     <section class="auth-shell page-enter">
       <div class="auth-frame">
         <article class="auth-hero hero-card">
+          <a routerLink="/" class="auth-brand-link">
+            <span class="brand-mark">QV</span>
+            <span class="brand-copy">
+              <strong>QuizVerse</strong>
+              <span>Back to home</span>
+            </span>
+          </a>
           <span class="inline-tag">Create account</span>
           <h1 class="hero-title">Comeca a construir a tua presenca no QuizVerse.</h1>
           <p class="hero-copy">Regista-te para jogar, criar quizzes e aparecer no ranking global.</p>
@@ -23,6 +30,13 @@ import { ToastService } from '../core/toast.service';
         </article>
 
         <article class="auth-panel">
+          <a routerLink="/" class="auth-brand-link">
+            <span class="brand-mark">QV</span>
+            <span class="brand-copy">
+              <strong>QuizVerse</strong>
+              <span>Pagina inicial</span>
+            </span>
+          </a>
           <span class="eyebrow">Novo utilizador</span>
           <h2>Criar conta</h2>
           <form (ngSubmit)="register()">
@@ -34,16 +48,21 @@ import { ToastService } from '../core/toast.service';
               <label class="field-label">Email</label>
               <input [(ngModel)]="email" name="email" placeholder="nome@email.com">
             </div>
-            <div>
+            <div class="password-field">
               <label class="field-label">Password</label>
-              <input [(ngModel)]="password" name="password" type="password" placeholder="Minimo 6 caracteres">
+              <input [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'" placeholder="Minimo 6 caracteres">
+              <button class="eye-button" type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+                <svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"></path>
+                  <circle cx="12" cy="12" r="3.2"></circle>
+                </svg>
+              </button>
             </div>
             <button class="primary-button" type="submit">Criar conta</button>
             <p class="success-text" *ngIf="msg">{{ msg }}</p>
           </form>
           <div class="form-links">
             <a routerLink="/login">Ja tenho conta</a>
-            <a routerLink="/admin-login">Area do admin</a>
           </div>
         </article>
       </div>
@@ -55,6 +74,7 @@ export class RegisterPageComponent {
   email = '';
   password = '';
   msg = '';
+  showPassword = false;
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
