@@ -11,10 +11,17 @@ export class ApiService {
   register(data: any) { return this.http.post<any>(`${this.base}/auth/register`, data); }
   forgotPassword(data: any) { return this.http.post<any>(`${this.base}/auth/forgot-password`, data); }
   resetPassword(data: any) { return this.http.post<any>(`${this.base}/auth/reset-password`, data); }
+  triviaCategories() { return this.http.get<any>(`${this.base}/trivia/categories`); }
   quizzes() { return this.http.get<any>(`${this.base}/quizzes`); }
   quiz(id: number) { return this.http.get<any>(`${this.base}/quizzes/${id}`); }
   submit(id: number, answers: any) { return this.http.post<any>(`${this.base}/quizzes/${id}/submit`, { answers }); }
   createQuiz(data: any) { return this.http.post<any>(`${this.base}/quizzes`, data); }
+  importQuiz(data: any) { return this.http.post<any>(`${this.base}/quizzes/import`, data); }
+  myQuizzes() { return this.http.get<any>(`${this.base}/my/quizzes`); }
+  myQuiz(id: number) { return this.http.get<any>(`${this.base}/my/quizzes/${id}`); }
+  updateMyQuiz(id: number, data: any) { return this.http.put<any>(`${this.base}/my/quizzes/${id}`, data); }
+  deleteMyQuiz(id: number) { return this.http.delete<any>(`${this.base}/my/quizzes/${id}`); }
+  quizAttempts(id: number) { return this.http.get<any>(`${this.base}/my/quizzes/${id}/attempts`); }
   profile() { return this.http.get<any>(`${this.base}/profile`); }
   ranking() { return this.http.get<any>(`${this.base}/ranking`); }
   adminUsers() { return this.http.get<any>(`${this.base}/admin/users`); }

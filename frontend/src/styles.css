@@ -116,6 +116,11 @@ textarea { min-height: 130px; resize: vertical; }
   letter-spacing: .08em;
   box-shadow: var(--shadow-soft);
 }
+.brand-mark img {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
 .brand-copy strong, .mobile-brand strong { display: block; font-size: 1rem; }
 .brand-copy span, .mobile-brand span, .user-meta span, .eyebrow, .muted, .sidebar-footer p {
   color: var(--text-soft);
@@ -508,5 +513,9 @@ textarea { min-height: 130px; resize: vertical; }
   }
   .topbar-cta {
     flex: 1 1 150px;
+  }
+  .user-chip {
+    width: 100%;
+    justify-content: space-between;
   }
 }

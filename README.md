@@ -32,7 +32,8 @@ Abre:
 
 ## Funcionalidades implementadas
 - Autenticação (login/registo)
-- Utilizador cria quiz (draft)
+- CRUD completo de quizzes próprios
+- Importação de quizzes pela Open Trivia DB
 - Lista e execução de quizzes publicados
 - Submissão e cálculo de score
 - Perfil com dados + ranking global
@@ -45,11 +46,22 @@ Abre:
 ## Endpoints principais
 - `POST /api/auth/register`
 - `POST /api/auth/login`
+- `GET /api/trivia/categories`
 - `GET /api/quizzes`
 - `GET /api/quizzes/{id}`
+- `GET /api/my/quizzes`
+- `GET /api/my/quizzes/{id}`
+- `PUT /api/my/quizzes/{id}`
+- `DELETE /api/my/quizzes/{id}`
+- `GET /api/my/quizzes/{id}/attempts`
 - `POST /api/quizzes/{id}/submit`
 - `POST /api/quizzes`
+- `POST /api/quizzes/import`
 - `GET /api/profile`
 - `GET /api/ranking`
 - `GET /api/admin/users`
 - `GET /api/admin/quizzes`
+
+## Trivia externa
+- Fonte atual: [Open Trivia DB](https://opentdb.com/api_config.php)
+- Segundo a documentação oficial, a API é gratuita, não exige API key, permite pesquisa por categoria/dificuldade/tipo e os dados estão sob licença CC BY-SA 4.0.

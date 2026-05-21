@@ -14,7 +14,7 @@ import { UiService } from './core/ui.service';
     <header class="topbar">
       <div class="topbar-left">
         <a routerLink="/" class="topbar-brand" aria-label="QuizVerse home">
-          <span class="brand-mark">QV</span>
+          <span class="brand-mark"><img src="assets/favicon.svg" alt="QuizVerse"></span>
           <span class="brand-copy topbar-brand-copy">
             <strong>QuizVerse</strong>
             <span>Smart quiz platform</span>
@@ -45,7 +45,7 @@ import { UiService } from './core/ui.service';
     <div class="shell-layout" [class.shell-layout-admin]="showAdminSidebar">
       <aside class="sidebar" *ngIf="showAdminSidebar" [class.sidebar-collapsed]="sidebarCollapsed">
         <div class="brand-block">
-          <a routerLink="/admin" class="brand-mark" aria-label="QuizVerse admin">QV</a>
+          <a routerLink="/admin" class="brand-mark" aria-label="QuizVerse admin"><img src="assets/favicon.svg" alt="QuizVerse"></a>
           <div class="brand-copy" *ngIf="!sidebarCollapsed">
             <strong>Admin Panel</strong>
             <span>Control center</span>

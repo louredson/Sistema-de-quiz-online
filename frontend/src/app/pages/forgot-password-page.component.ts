@@ -13,7 +13,7 @@ import { ToastService } from '../core/toast.service';
       <div class="auth-frame">
         <article class="auth-hero hero-card">
           <a routerLink="/" class="auth-brand-link">
-            <span class="brand-mark">QV</span>
+            <span class="brand-mark"><img src="assets/favicon.svg" alt="QuizVerse"></span>
             <span class="brand-copy">
               <strong>QuizVerse</strong>
               <span>Back to home</span>
@@ -31,7 +31,7 @@ import { ToastService } from '../core/toast.service';
 
         <article class="auth-panel">
           <a routerLink="/" class="auth-brand-link">
-            <span class="brand-mark">QV</span>
+            <span class="brand-mark"><img src="assets/favicon.svg" alt="QuizVerse"></span>
             <span class="brand-copy">
               <strong>QuizVerse</strong>
               <span>Pagina inicial</span>

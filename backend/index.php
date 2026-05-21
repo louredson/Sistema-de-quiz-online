@@ -1,7 +1,7 @@
 ﻿<?php
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
@@ -56,13 +56,48 @@ try {
         QuizController::listPublished();
     }
 
+    if ($route === '/api/trivia/categories' && $method === 'GET') {
+        AuthMiddleware::user();
+        QuizController::externalCategories();
+    }
+
     if (preg_match('#^/api/quizzes/(\d+)$#', $route, $m) && $method === 'GET') {
         QuizController::getById((int)$m[1]);
+    }
+
+    if ($route === '/api/my/quizzes' && $method === 'GET') {
+        $user = AuthMiddleware::user();
+        QuizController::listMine((int)$user['id'], ($user['role'] ?? '') === 'admin');
+    }
+
+    if (preg_match('#^/api/my/quizzes/(\d+)$#', $route, $m) && $method === 'GET') {
+        $user = AuthMiddleware::user();
+        QuizController::getEditableById((int)$m[1], (int)$user['id'], ($user['role'] ?? '') === 'admin');
     }
 
     if ($route === '/api/quizzes' && $method === 'POST') {
         $user = AuthMiddleware::user();
         QuizController::create((int)$user['id']);
+    }
+
+    if ($route === '/api/quizzes/import' && $method === 'POST') {
+        $user = AuthMiddleware::user();
+        QuizController::importFromExternal((int)$user['id']);
+    }
+
+    if (preg_match('#^/api/my/quizzes/(\d+)$#', $route, $m) && $method === 'PUT') {
+        $user = AuthMiddleware::user();
+        QuizController::update((int)$m[1], (int)$user['id'], ($user['role'] ?? '') === 'admin');
+    }
+
+    if (preg_match('#^/api/my/quizzes/(\d+)$#', $route, $m) && $method === 'DELETE') {
+        $user = AuthMiddleware::user();
+        QuizController::delete((int)$m[1], (int)$user['id'], ($user['role'] ?? '') === 'admin');
+    }
+
+    if (preg_match('#^/api/my/quizzes/(\d+)/attempts$#', $route, $m) && $method === 'GET') {
+        $user = AuthMiddleware::user();
+        QuizController::attemptsForQuiz((int)$m[1], (int)$user['id'], ($user['role'] ?? '') === 'admin');
     }
 
     if (preg_match('#^/api/quizzes/(\d+)/submit$#', $route, $m) && $method === 'POST') {
