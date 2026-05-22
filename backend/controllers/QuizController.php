@@ -1,15 +1,29 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/ExternalTriviaService.php';
+require_once __DIR__ . '/../core/GeminiQuizService.php';
 require_once __DIR__ . '/../core/Request.php';
 require_once __DIR__ . '/../core/Response.php';
 
 class QuizController
 {
+    private static function ensureNonAdmin(int $userId): void
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare('SELECT role FROM users WHERE id = ?');
+        $stmt->execute([$userId]);
+        $role = $stmt->fetchColumn();
+        if ($role === 'admin') {
+            Response::json(['message' => 'O administrador nao pode jogar ou criar quizzes'], 403);
+        }
+    }
+
     public static function listPublished(): void
     {
         $db = Database::getConnection();
-        $sql = 'SELECT q.id, q.title, q.description, q.category, q.created_by, u.name AS author
+        $sql = 'SELECT q.id, q.title, q.description, q.category, q.created_by, q.created_at, u.name AS author,
+                       (SELECT COUNT(*) FROM quiz_questions qq WHERE qq.quiz_id = q.id) AS question_count,
+                       (SELECT COUNT(*) FROM quiz_attempts qa WHERE qa.quiz_id = q.id) AS attempts_count
                 FROM quizzes q
                 INNER JOIN users u ON u.id = q.created_by
                 WHERE q.status = "published"
@@ -26,39 +40,26 @@ class QuizController
         $quiz = $stmt->fetch();
 
         if (!$quiz) {
-            Response::json(['message' => 'Quiz não encontrado'], 404);
+            Response::json(['message' => 'Quiz nao encontrado'], 404);
         }
 
-        $stmt = $db->prepare('SELECT id, question_text FROM quiz_questions WHERE quiz_id = ? ORDER BY id ASC');
-        $stmt->execute([$id]);
-        $questions = $stmt->fetchAll();
-
-        foreach ($questions as &$question) {
-            $opt = $db->prepare('SELECT id, option_text FROM quiz_options WHERE question_id = ? ORDER BY id ASC');
-            $opt->execute([$question['id']]);
-            $question['options'] = $opt->fetchAll();
-        }
-
-        $quiz['questions'] = $questions;
+        $quiz['questions'] = self::loadQuestions($db, $id, false);
         Response::json(['quiz' => $quiz]);
     }
 
     public static function listMine(int $userId, bool $isAdmin = false): void
     {
         $db = Database::getConnection();
-        $sql = 'SELECT q.id, q.title, q.description, q.category, q.status, q.created_at, u.name AS author
+        $sql = 'SELECT q.id, q.title, q.description, q.category, q.status, q.created_at, u.name AS author,
+                       (SELECT COUNT(*) FROM quiz_questions qq WHERE qq.quiz_id = q.id) AS question_count,
+                       (SELECT COUNT(*) FROM quiz_attempts qa WHERE qa.quiz_id = q.id) AS attempts_count
                 FROM quizzes q
-                INNER JOIN users u ON u.id = q.created_by';
-
-        if (!$isAdmin) {
-            $sql .= ' WHERE q.created_by = :user_id';
-        }
+                INNER JOIN users u ON u.id = q.created_by
+                WHERE q.created_by = :user_id';
 
         $sql .= ' ORDER BY q.created_at DESC';
         $stmt = $db->prepare($sql);
-        if (!$isAdmin) {
-            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
-        }
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
         Response::json(['quizzes' => $stmt->fetchAll()]);
@@ -69,7 +70,7 @@ class QuizController
         $db = Database::getConnection();
         $quiz = self::fetchQuizForOwner($db, $id, $userId, $isAdmin);
         if (!$quiz) {
-            Response::json(['message' => 'Quiz não encontrado'], 404);
+            Response::json(['message' => 'Quiz nao encontrado'], 404);
         }
 
         $quiz['questions'] = self::loadQuestions($db, $id, true);
@@ -78,10 +79,11 @@ class QuizController
 
     public static function submit(int $quizId, int $userId): void
     {
+        self::ensureNonAdmin($userId);
         $db = Database::getConnection();
         $answers = Request::body()['answers'] ?? [];
         if (!is_array($answers) || count($answers) === 0) {
-            Response::json(['message' => 'Respostas inválidas'], 422);
+            Response::json(['message' => 'Respostas invalidas'], 422);
         }
 
         $stmt = $db->prepare('SELECT qq.id AS question_id, qo.id AS correct_option_id
@@ -135,7 +137,7 @@ class QuizController
     {
         $db = Database::getConnection();
         if (!self::fetchQuizForOwner($db, $quizId, $userId, $isAdmin)) {
-            Response::json(['message' => 'Quiz não encontrado'], 404);
+            Response::json(['message' => 'Quiz nao encontrado'], 404);
         }
 
         $data = Request::body();
@@ -147,7 +149,7 @@ class QuizController
     {
         $db = Database::getConnection();
         if (!self::fetchQuizForOwner($db, $quizId, $userId, $isAdmin)) {
-            Response::json(['message' => 'Quiz não encontrado'], 404);
+            Response::json(['message' => 'Quiz nao encontrado'], 404);
         }
 
         $stmt = $db->prepare('DELETE FROM quizzes WHERE id = ?');
@@ -161,7 +163,7 @@ class QuizController
         $data = Request::body();
         $questions = ExternalTriviaService::questions($data);
         if (!$questions) {
-            Response::json(['message' => 'A API externa não devolveu perguntas'], 422);
+            Response::json(['message' => 'A API externa nao devolveu perguntas'], 422);
         }
 
         $normalized = [];
@@ -208,6 +210,32 @@ class QuizController
         ], 201);
     }
 
+    public static function generateWithGemini(int $userId): void
+    {
+        $db = Database::getConnection();
+        $data = Request::body();
+        $generated = GeminiQuizService::generate($data);
+        $quizId = self::persistQuiz($db, [
+            'title' => $generated['title'],
+            'description' => $generated['description'],
+            'category' => $generated['category'],
+            'status' => $data['status'] ?? 'draft',
+            'questions' => $generated['questions']
+        ], $userId);
+
+        Response::json([
+            'message' => 'Quiz gerado com sucesso',
+            'quiz_id' => $quizId,
+            'questions_generated' => count($generated['questions']),
+            'source' => 'Gemini API'
+        ], 201);
+    }
+
+    public static function geminiStatus(): void
+    {
+        Response::json(GeminiQuizService::status());
+    }
+
     public static function externalCategories(): void
     {
         Response::json(['categories' => ExternalTriviaService::categories()]);
@@ -217,7 +245,7 @@ class QuizController
     {
         $db = Database::getConnection();
         if (!self::fetchQuizForOwner($db, $quizId, $userId, $isAdmin)) {
-            Response::json(['message' => 'Quiz não encontrado'], 404);
+            Response::json(['message' => 'Quiz nao encontrado'], 404);
         }
 
         $stmt = $db->prepare('SELECT qa.id, qa.total_questions, qa.correct_answers, qa.score, qa.created_at, u.name AS player_name
@@ -237,7 +265,7 @@ class QuizController
         $questions = $data['questions'] ?? [];
 
         if ($title === '' || !is_array($questions) || count($questions) === 0) {
-            Response::json(['message' => 'Dados do quiz inválidos'], 422);
+            Response::json(['message' => 'Dados do quiz invalidos'], 422);
         }
 
         $status = ($data['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
@@ -273,7 +301,7 @@ class QuizController
         $correctIndex = (int)($question['correct_index'] ?? -1);
 
         if ($qText === '' || count($options) < 2 || $correctIndex < 0 || $correctIndex >= count($options)) {
-            throw new Exception('Pergunta inválida');
+            throw new Exception('Pergunta invalida');
         }
 
         $qStmt = $db->prepare('INSERT INTO quiz_questions (quiz_id, question_text) VALUES (?, ?)');
@@ -310,7 +338,9 @@ class QuizController
 
     private static function fetchQuizForOwner(PDO $db, int $quizId, int $userId, bool $isAdmin = false): ?array
     {
-        $sql = 'SELECT q.id, q.title, q.description, q.category, q.status, q.created_by, q.created_at, u.name AS author
+        $sql = 'SELECT q.id, q.title, q.description, q.category, q.status, q.created_by, q.created_at, u.name AS author,
+                       (SELECT COUNT(*) FROM quiz_questions qq WHERE qq.quiz_id = q.id) AS question_count,
+                       (SELECT COUNT(*) FROM quiz_attempts qa WHERE qa.quiz_id = q.id) AS attempts_count
                 FROM quizzes q
                 INNER JOIN users u ON u.id = q.created_by
                 WHERE q.id = :quiz_id';

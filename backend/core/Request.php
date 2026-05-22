@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 class Request
 {
     public static function body(): array

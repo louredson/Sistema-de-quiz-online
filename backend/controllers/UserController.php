@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Response.php';
 
@@ -11,6 +11,18 @@ class UserController
         $stmt = $db->prepare('SELECT id, name, email, role, created_at FROM users WHERE id = ?');
         $stmt->execute([$userId]);
         $user = $stmt->fetch();
+
+        if (($user['role'] ?? '') === 'admin') {
+            Response::json([
+                'profile' => $user,
+                'stats' => [
+                    'total_attempts' => 0,
+                    'best_score' => 0,
+                    'avg_score' => 0,
+                    'global_rank' => 0
+                ]
+            ]);
+        }
 
         $stats = $db->prepare('SELECT COUNT(*) AS total_attempts, COALESCE(MAX(score), 0) AS best_score, COALESCE(AVG(score), 0) AS avg_score FROM quiz_attempts WHERE user_id = ?');
         $stats->execute([$userId]);
@@ -46,6 +58,7 @@ class UserController
                        COALESCE(AVG(qa.score), 0) AS avg_score
                 FROM users u
                 LEFT JOIN quiz_attempts qa ON qa.user_id = u.id
+                WHERE u.role = "user"
                 GROUP BY u.id, u.name
                 ORDER BY total_score DESC, best_score DESC, avg_score DESC
                 LIMIT 100';

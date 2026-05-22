@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -56,6 +56,11 @@ try {
         QuizController::listPublished();
     }
 
+    if ($route === '/api/ai/gemini/status' && $method === 'GET') {
+        AuthMiddleware::user();
+        QuizController::geminiStatus();
+    }
+
     if ($route === '/api/trivia/categories' && $method === 'GET') {
         AuthMiddleware::user();
         QuizController::externalCategories();
@@ -67,12 +72,12 @@ try {
 
     if ($route === '/api/my/quizzes' && $method === 'GET') {
         $user = AuthMiddleware::user();
-        QuizController::listMine((int)$user['id'], ($user['role'] ?? '') === 'admin');
+        QuizController::listMine((int)$user['id']);
     }
 
     if (preg_match('#^/api/my/quizzes/(\d+)$#', $route, $m) && $method === 'GET') {
         $user = AuthMiddleware::user();
-        QuizController::getEditableById((int)$m[1], (int)$user['id'], ($user['role'] ?? '') === 'admin');
+        QuizController::getEditableById((int)$m[1], (int)$user['id']);
     }
 
     if ($route === '/api/quizzes' && $method === 'POST') {
@@ -85,19 +90,24 @@ try {
         QuizController::importFromExternal((int)$user['id']);
     }
 
+    if ($route === '/api/quizzes/generate-ai' && $method === 'POST') {
+        $user = AuthMiddleware::user();
+        QuizController::generateWithGemini((int)$user['id']);
+    }
+
     if (preg_match('#^/api/my/quizzes/(\d+)$#', $route, $m) && $method === 'PUT') {
         $user = AuthMiddleware::user();
-        QuizController::update((int)$m[1], (int)$user['id'], ($user['role'] ?? '') === 'admin');
+        QuizController::update((int)$m[1], (int)$user['id']);
     }
 
     if (preg_match('#^/api/my/quizzes/(\d+)$#', $route, $m) && $method === 'DELETE') {
         $user = AuthMiddleware::user();
-        QuizController::delete((int)$m[1], (int)$user['id'], ($user['role'] ?? '') === 'admin');
+        QuizController::delete((int)$m[1], (int)$user['id']);
     }
 
     if (preg_match('#^/api/my/quizzes/(\d+)/attempts$#', $route, $m) && $method === 'GET') {
         $user = AuthMiddleware::user();
-        QuizController::attemptsForQuiz((int)$m[1], (int)$user['id'], ($user['role'] ?? '') === 'admin');
+        QuizController::attemptsForQuiz((int)$m[1], (int)$user['id']);
     }
 
     if (preg_match('#^/api/quizzes/(\d+)/submit$#', $route, $m) && $method === 'POST') {
@@ -122,20 +132,20 @@ try {
 
     if (preg_match('#^/api/admin/users/(\d+)$#', $route, $m) && $method === 'PUT') {
         AuthMiddleware::admin();
-        AdminController::updateUserRole((int)$m[1]);
+        AdminController::updateUserAccess((int)$m[1]);
     }
 
-    if ($route === '/api/admin/quizzes' && $method === 'GET') {
+    if ($route === '/api/admin/dashboard' && $method === 'GET') {
         AuthMiddleware::admin();
-        AdminController::quizzes();
+        AdminController::dashboard();
     }
 
-    if (preg_match('#^/api/admin/quizzes/(\d+)$#', $route, $m) && $method === 'PUT') {
+    if ($route === '/api/admin/report' && $method === 'POST') {
         AuthMiddleware::admin();
-        AdminController::updateQuizStatus((int)$m[1]);
+        AdminController::report();
     }
 
-    Response::json(['message' => 'Rota não encontrada', 'route' => $route], 404);
+    Response::json(['message' => 'Rota nao encontrada', 'route' => $route], 404);
 } catch (Throwable $e) {
     Response::json(['message' => 'Erro interno', 'error' => $e->getMessage()], 500);
 }

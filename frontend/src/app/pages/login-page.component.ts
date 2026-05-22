@@ -21,12 +21,12 @@ import { ToastService } from '../core/toast.service';
             </span>
           </a>
           <span class="inline-tag">QuizVerse Login</span>
-          <h1 class="hero-title">Entra e continua a subir no ranking.</h1>
-          <p class="hero-copy">Performance, estatisticas, quizzes e competicao num painel moderno e rapido.</p>
+          <h1 class="hero-title">Uma unica entrada para toda a plataforma.</h1>
+          <p class="hero-copy">Jogadores e administrador entram pela mesma area. O sistema identifica o perfil e abre automaticamente a experiencia certa.</p>
           <ul class="feature-list">
-            <li>Ranking global com destaque para top jogadores.</li>
-            <li>Modo claro e escuro com persistencia local.</li>
-            <li>Experiencia pensada para desktop e mobile.</li>
+            <li>Explorar quizzes publicados e tendencias da comunidade.</li>
+            <li>Criar quizzes com suporte de IA e gerir rascunhos.</li>
+            <li>Painel administrativo reservado apos autenticacao.</li>
           </ul>
         </article>
 
@@ -38,9 +38,9 @@ import { ToastService } from '../core/toast.service';
               <span>Pagina inicial</span>
             </span>
           </a>
-          <span class="eyebrow">Area do utilizador</span>
+          <span class="eyebrow">Acesso unico</span>
           <h2>Entrar na conta</h2>
-          <p class="helper-copy">Usa a tua conta para jogar quizzes, acompanhar historico e criar novos desafios.</p>
+          <p class="helper-copy">Usa a tua conta para jogar, criar ou administrar. O redirecionamento e feito conforme o teu perfil.</p>
           <form (ngSubmit)="login()">
             <div>
               <label class="field-label">Email</label>
@@ -83,11 +83,11 @@ export class LoginPageComponent {
       next: (response) => {
         this.session.setSession(response.token, response.user);
         this.toast.success('Sessao iniciada', 'Bem-vindo de volta ao QuizVerse.');
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl(response.user?.role === 'admin' ? '/admin' : '/');
       },
       error: (e) => {
         this.error = e.error?.message || 'Erro ao autenticar';
-        this.toast.error('Senha incorreta', this.error);
+        this.toast.error('Falha no login', this.error);
       }
     });
   }

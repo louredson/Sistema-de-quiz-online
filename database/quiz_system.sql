@@ -23,6 +23,7 @@ CREATE TABLE quizzes (
   title VARCHAR(180) NOT NULL,
   description TEXT,
   category VARCHAR(100) NOT NULL DEFAULT 'Geral',
+  image_url VARCHAR(255) DEFAULT NULL,
   created_by INT NOT NULL,
   status ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -86,5 +87,4 @@ INSERT INTO quiz_options (question_id, option_text, is_correct) VALUES
 (2, '40', 0);
 
 INSERT INTO quiz_attempts (quiz_id, user_id, total_questions, correct_answers, score) VALUES
-(1, 2, 2, 2, 100),
-(1, 1, 2, 1, 50);
+(1, 2, 2, 2, 100);

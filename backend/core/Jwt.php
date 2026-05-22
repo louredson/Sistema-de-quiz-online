@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 class Jwt
 {
     public static function encode(array $payload): string

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../core/Request.php';
 require_once __DIR__ . '/../core/Response.php';
 require_once __DIR__ . '/../core/Jwt.php';

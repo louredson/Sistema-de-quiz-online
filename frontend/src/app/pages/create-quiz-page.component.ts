@@ -12,58 +12,79 @@ import { ToastService } from '../core/toast.service';
       <article class="form-panel">
         <div class="card-header">
           <div>
-            <span class="eyebrow">Quiz import</span>
-            <h2>Importar quiz online</h2>
-            <p class="helper-copy">Busca perguntas automaticamente pela Open Trivia DB e guarda o quiz localmente na tua base de dados.</p>
+            <span class="eyebrow">Criar com IA</span>
+            <h2>Gerar quiz com Gemini API</h2>
+            <p class="helper-copy">Preenche o tema, define o nivel e deixa a base pronta para a Gemini gerar um quiz completo e gravar diretamente na tua base de dados.</p>
           </div>
+          <span class="pill-status" [class.status-success]="geminiReady" [class.status-warning]="!geminiReady">
+            {{ geminiReady ? 'Gemini configurada' : 'Gemini pendente' }}
+          </span>
+        </div>
+
+        <div class="empty-state" *ngIf="!geminiReady" style="text-align:left; margin-bottom:1rem;">
+          A base da integracao ja esta pronta. Falta apenas colocares a tua chave em <strong>backend/config/config.php</strong> no campo <code>gemini_api_key</code>.
         </div>
 
         <div class="form-stack">
           <div>
-            <label class="field-label">Titulo do quiz</label>
-            <input [(ngModel)]="importForm.title" placeholder="Ex.: Ciencia Express">
+            <label class="field-label">Tema principal</label>
+            <input [(ngModel)]="generatorForm.topic" placeholder="Ex.: Redes de computadores, Historia de Angola, Matematica basica">
           </div>
 
           <div class="input-row">
             <div style="flex:1; min-width:220px;">
-              <label class="field-label">Categoria externa</label>
-              <select [(ngModel)]="importForm.category">
-                <option value="">Qualquer categoria</option>
-                <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+              <label class="field-label">Titulo sugerido</label>
+              <input [(ngModel)]="generatorForm.title" placeholder="Ex.: Desafio de Redes 2026">
+            </div>
+            <div style="flex:1; min-width:220px;">
+              <label class="field-label">Categoria</label>
+              <input [(ngModel)]="generatorForm.category" placeholder="Tecnologia, Ciencias, Cultura geral">
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div style="flex:1; min-width:220px;">
+              <label class="field-label">Publico-alvo</label>
+              <input [(ngModel)]="generatorForm.audience" placeholder="Ex.: estudantes do medio, universitarios, iniciantes">
+            </div>
+            <div style="flex:1; min-width:220px;">
+              <label class="field-label">Idioma</label>
+              <select [(ngModel)]="generatorForm.language">
+                <option value="pt">Portugues</option>
+                <option value="en">English</option>
               </select>
             </div>
+          </div>
+
+          <div class="input-row">
             <div style="flex:1; min-width:220px;">
               <label class="field-label">Dificuldade</label>
-              <select [(ngModel)]="importForm.difficulty">
-                <option value="">Qualquer</option>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
+              <select [(ngModel)]="generatorForm.difficulty">
+                <option value="easy">Facil</option>
+                <option value="medium">Media</option>
+                <option value="hard">Dificil</option>
               </select>
             </div>
-          </div>
-
-          <div class="input-row">
             <div style="flex:1; min-width:220px;">
-              <label class="field-label">Quantidade</label>
-              <input [(ngModel)]="importForm.amount" type="number" min="1" max="20">
+              <label class="field-label">Quantidade de perguntas</label>
+              <input [(ngModel)]="generatorForm.amount" type="number" min="3" max="15">
             </div>
             <div style="flex:1; min-width:220px;">
               <label class="field-label">Estado</label>
-              <select [(ngModel)]="importForm.status">
-                <option value="draft">Draft</option>
+              <select [(ngModel)]="generatorForm.status">
+                <option value="draft">Rascunho</option>
                 <option value="published">Publicado</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label class="field-label">Descricao</label>
-            <textarea [(ngModel)]="importForm.description" placeholder="Descricao opcional do quiz"></textarea>
+            <label class="field-label">Descricao base</label>
+            <textarea [(ngModel)]="generatorForm.description" placeholder="Breve contexto para orientar a geracao do quiz"></textarea>
           </div>
 
           <div class="section-actions">
-            <button class="primary-button" type="button" (click)="importQuiz()">Importar perguntas online</button>
+            <button class="primary-button" type="button" (click)="generateQuiz()">Gerar quiz com IA</button>
           </div>
         </div>
       </article>
@@ -71,35 +92,93 @@ import { ToastService } from '../core/toast.service';
       <article class="panel-card">
         <div class="card-header-inline">
           <div>
-            <span class="eyebrow">My quizzes</span>
-            <h2>CRUD completo dos teus quizzes</h2>
+            <span class="eyebrow">Organizacao</span>
+            <h2>Os teus quizzes</h2>
           </div>
           <span class="pill-status status-success">{{ myQuizzes.length }} quizzes</span>
         </div>
 
-        <div class="quiz-list" *ngIf="myQuizzes.length; else noMine">
-          <div class="quiz-list-item" *ngFor="let quiz of myQuizzes">
-            <div class="quiz-meta">
-              <strong>{{ quiz.title }}</strong>
-              <span>{{ quiz.category }} · {{ quiz.status }} · {{ quiz.author }}</span>
-            </div>
-            <div class="section-actions">
-              <button class="secondary-button" type="button" (click)="loadQuizForEdit(quiz.id)">Editar</button>
-              <button class="ghost-button" type="button" (click)="deleteQuiz(quiz.id)">Apagar</button>
-            </div>
+        <div class="filter-row" style="margin-bottom:1rem;">
+          <div style="flex:1; min-width:220px;">
+            <label class="field-label">Filtrar por categoria</label>
+            <select [(ngModel)]="selectedCategory">
+              <option value="">Todas</option>
+              <option *ngFor="let category of quizCategories" [value]="category">{{ category }}</option>
+            </select>
           </div>
         </div>
-        <ng-template #noMine>
-          <div class="empty-state">Ainda nao tens quizzes guardados.</div>
+
+        <div class="quiz-card-grid" *ngIf="publishedQuizzes.length; else noPublished">
+          <article class="quiz-card" *ngFor="let quiz of publishedQuizzes">
+            <img class="quiz-card-image" [src]="quizImage(quiz)" [alt]="quiz.title">
+            <div class="quiz-card-body">
+              <div>
+                <strong>{{ quiz.title }}</strong>
+                <p class="card-description">{{ quiz.description || 'Quiz publicado e pronto para receber participantes.' }}</p>
+              </div>
+              <div class="quiz-card-meta">
+                <span class="badge">{{ quiz.category }}</span>
+                <span class="badge">Publicado</span>
+              </div>
+              <div class="card-footer">
+                <div class="card-footer-meta">
+                  <span class="muted">Por {{ quiz.author }}</span>
+                  <span class="muted">{{ formatPublishedAt(quiz.created_at) }}</span>
+                </div>
+                <div class="section-actions">
+                  <button class="secondary-button" type="button" (click)="loadQuizForEdit(quiz.id)">Editar</button>
+                  <button class="ghost-button" type="button" (click)="deleteQuiz(quiz.id)">Apagar</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <ng-template #noPublished>
+          <div class="empty-state">Ainda nao tens quizzes publicados.</div>
+        </ng-template>
+
+        <div class="card-header-inline" style="margin-top:1.2rem;">
+          <div>
+            <span class="eyebrow">Rascunhos</span>
+            <h2>Prontos para revisar</h2>
+          </div>
+        </div>
+        <div class="quiz-card-grid" *ngIf="draftQuizzes.length; else noDrafts">
+          <article class="quiz-card" *ngFor="let quiz of draftQuizzes">
+            <img class="quiz-card-image" [src]="quizImage(quiz)" [alt]="quiz.title">
+            <div class="quiz-card-body">
+              <div>
+                <strong>{{ quiz.title }}</strong>
+                <p class="card-description">{{ quiz.description || 'Rascunho pronto para revisao e publicacao.' }}</p>
+              </div>
+              <div class="quiz-card-meta">
+                <span class="badge">{{ quiz.category }}</span>
+                <span class="badge">Rascunho</span>
+              </div>
+              <div class="card-footer">
+                <div class="card-footer-meta">
+                  <span class="muted">Por {{ quiz.author }}</span>
+                  <span class="muted">{{ formatPublishedAt(quiz.created_at) }}</span>
+                </div>
+                <div class="section-actions">
+                  <button class="secondary-button" type="button" (click)="loadQuizForEdit(quiz.id)">Editar</button>
+                  <button class="ghost-button" type="button" (click)="deleteQuiz(quiz.id)">Apagar</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <ng-template #noDrafts>
+          <div class="empty-state">Nao tens rascunhos neste momento.</div>
         </ng-template>
       </article>
 
       <article class="table-card" *ngIf="editModel">
         <div class="card-header">
           <div>
-            <span class="eyebrow">Edit quiz</span>
+            <span class="eyebrow">Editar quiz</span>
             <h2>{{ editModel.title }}</h2>
-            <p class="helper-copy">Podes alterar titulo, descricao, categoria, estado e todo o conteudo das perguntas.</p>
+            <p class="helper-copy">Depois de gerado, podes rever perguntas, trocar opcoes e publicar quando estiver tudo certo.</p>
           </div>
         </div>
 
@@ -117,7 +196,7 @@ import { ToastService } from '../core/toast.service';
             <div style="flex:1; min-width:220px;">
               <label class="field-label">Estado</label>
               <select [(ngModel)]="editModel.status">
-                <option value="draft">Draft</option>
+                <option value="draft">Rascunho</option>
                 <option value="published">Publicado</option>
               </select>
             </div>
@@ -161,28 +240,48 @@ import { ToastService } from '../core/toast.service';
 export class CreateQuizPageComponent {
   readonly api = inject(ApiService);
   readonly toast = inject(ToastService);
-  categories: Array<{ id: number; name: string }> = [];
   myQuizzes: any[] = [];
   editModel: any = null;
+  geminiReady = false;
+  selectedCategory = '';
 
-  importForm = {
+  generatorForm = {
+    topic: '',
     title: '',
     category: '',
-    difficulty: '',
-    amount: 10,
+    audience: 'estudantes e curiosos',
+    language: 'pt',
+    difficulty: 'medium',
+    amount: 8,
     status: 'draft',
     description: ''
   };
 
   constructor() {
-    this.loadCategories();
+    this.loadGeminiStatus();
     this.loadMyQuizzes();
   }
 
-  loadCategories() {
-    this.api.triviaCategories().subscribe({
-      next: (response) => this.categories = response.categories || [],
-      error: () => this.toast.error('API externa indisponivel', 'Nao foi possivel carregar as categorias da trivia.')
+  get publishedQuizzes() {
+    return this.filteredQuizzes.filter((quiz) => quiz.status === 'published');
+  }
+
+  get draftQuizzes() {
+    return this.filteredQuizzes.filter((quiz) => quiz.status !== 'published');
+  }
+
+  get quizCategories() {
+    return Array.from(new Set(this.myQuizzes.map((quiz) => quiz.category || 'Geral'))).sort();
+  }
+
+  get filteredQuizzes() {
+    return this.myQuizzes.filter((quiz) => !this.selectedCategory || (quiz.category || 'Geral') === this.selectedCategory);
+  }
+
+  loadGeminiStatus() {
+    this.api.geminiStatus().subscribe({
+      next: (response) => this.geminiReady = !!response.configured,
+      error: () => this.geminiReady = false
     });
   }
 
@@ -193,24 +292,14 @@ export class CreateQuizPageComponent {
     });
   }
 
-  importQuiz() {
-    const selectedCategory = this.categories.find((item) => String(item.id) === String(this.importForm.category));
-    const payload = {
-      title: this.importForm.title,
-      category: this.importForm.category,
-      category_name: selectedCategory?.name || '',
-      difficulty: this.importForm.difficulty,
-      amount: this.importForm.amount,
-      status: this.importForm.status,
-      description: this.importForm.description
-    };
-
-    this.api.importQuiz(payload).subscribe({
+  generateQuiz() {
+    this.api.generateAiQuiz(this.generatorForm).subscribe({
       next: (response) => {
-        this.toast.success('Quiz importado com sucesso', `${response.questions_imported} perguntas importadas da Open Trivia DB.`);
+        this.toast.success('Quiz gerado com sucesso', `${response.questions_generated} perguntas criadas com Gemini API.`);
         this.loadMyQuizzes();
+        this.loadQuizForEdit(response.quiz_id);
       },
-      error: (e) => this.toast.error('Falha na importacao', e.error?.message || 'Nao foi possivel importar o quiz online.')
+      error: (e) => this.toast.error('Falha na geracao', e.error?.message || 'Nao foi possivel gerar o quiz com a Gemini API.')
     });
   }
 
@@ -280,6 +369,26 @@ export class CreateQuizPageComponent {
         this.loadMyQuizzes();
       },
       error: (e) => this.toast.error('Falha ao apagar', e.error?.message || 'Nao foi possivel remover o quiz.')
+    });
+  }
+
+  quizImage(quiz: any) {
+    const title = encodeURIComponent(quiz?.title || 'QuizVerse');
+    const category = encodeURIComponent(quiz?.category || 'Quiz');
+    return `https://placehold.co/640x400/e2e8f0/1f2937?text=${title}%0A${category}`;
+  }
+
+  formatPublishedAt(value: string) {
+    if (!value) {
+      return 'Agora mesmo';
+    }
+
+    return new Date(value).toLocaleString('pt-PT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 }

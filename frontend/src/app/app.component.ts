@@ -20,6 +20,14 @@ import { UiService } from './core/ui.service';
             <span>Smart quiz platform</span>
           </span>
         </a>
+
+        <nav class="topbar-nav">
+          <a routerLink="/">Home</a>
+          <a routerLink="/explore">Explorar</a>
+          <a *ngIf="session.user()" routerLink="/create-quiz">Criar</a>
+          <a *ngIf="session.user()?.role === 'user'" routerLink="/ranking">Ranking</a>
+          <a *ngIf="session.user()?.role === 'admin'" routerLink="/admin">Dashboard</a>
+        </nav>
       </div>
 
       <div class="topbar-right">
@@ -42,34 +50,29 @@ import { UiService } from './core/ui.service';
       </div>
     </header>
 
-    <div class="shell-layout" [class.shell-layout-admin]="showAdminSidebar">
-      <aside class="sidebar" *ngIf="showAdminSidebar" [class.sidebar-collapsed]="sidebarCollapsed">
-        <div class="brand-block">
-          <a routerLink="/admin" class="brand-mark" aria-label="QuizVerse admin"><img src="assets/favicon.svg" alt="QuizVerse"></a>
-          <div class="brand-copy" *ngIf="!sidebarCollapsed">
-            <strong>Admin Panel</strong>
-            <span>Control center</span>
-          </div>
-        </div>
-
-        <button class="sidebar-toggle" type="button" (click)="sidebarCollapsed = !sidebarCollapsed">
-          {{ sidebarCollapsed ? '>' : '<' }}
-        </button>
-
-        <nav class="menu">
-          <a *ngFor="let item of adminNavItems"
-             [routerLink]="item.route"
-             class="menu-item">
-            <span class="menu-icon">{{ item.icon }}</span>
-            <span *ngIf="!sidebarCollapsed">{{ item.label }}</span>
-          </a>
-        </nav>
-      </aside>
-
+    <div class="shell-layout">
       <main class="page-shell" [class.page-shell-auth]="isAuthRoute">
         <router-outlet />
       </main>
     </div>
+
+    <footer class="app-footer">
+      <div class="app-footer-inner">
+        <div class="footer-brand">
+          <span class="brand-mark"><img src="assets/favicon.svg" alt="QuizVerse"></span>
+          <div class="brand-copy">
+            <strong>QuizVerse</strong>
+            <span>Explora quizzes, cria conteudo com IA e acompanha rankings em tempo real.</span>
+          </div>
+        </div>
+
+        <div class="footer-links">
+          <span>Angular + PHP + MySQL</span>
+          <span>Gemini-ready quiz generation</span>
+          <span>PT / EN</span>
+        </div>
+      </div>
+    </footer>
 
     <app-toast-viewport />
   `
@@ -78,15 +81,8 @@ export class AppComponent {
   readonly ui = inject(UiService);
   readonly session = inject(SessionService);
   private readonly router = inject(Router);
-  sidebarCollapsed = false;
   isAuthRoute = false;
   currentUrl = '';
-  adminNavItems = [
-    { route: '/admin', label: 'Dashboard', icon: 'D' },
-    { route: '/ranking', label: 'Rankings', icon: 'R' },
-    { route: '/create-quiz', label: 'Criar Quiz', icon: 'C' },
-    { route: '/profile', label: 'Perfil', icon: 'P' }
-  ];
 
   constructor() {
     this.ui.initTheme();
@@ -105,10 +101,6 @@ export class AppComponent {
     return user.name.split(' ').slice(0, 2).map((part: string) => part[0]).join('').toUpperCase();
   }
 
-  get showAdminSidebar() {
-    return this.currentUrl.startsWith('/admin') && this.session.user()?.role === 'admin';
-  }
-
   switchLang() {
     this.ui.setLang(this.ui.lang() === 'pt' ? 'en' : 'pt');
   }
@@ -124,6 +116,6 @@ export class AppComponent {
 
   private trackRoute(url: string) {
     this.currentUrl = url;
-    this.isAuthRoute = ['/login', '/register', '/admin-login', '/forgot-password'].some((route) => url.startsWith(route));
+    this.isAuthRoute = ['/login', '/register', '/forgot-password'].some((route) => url.startsWith(route));
   }
 }
