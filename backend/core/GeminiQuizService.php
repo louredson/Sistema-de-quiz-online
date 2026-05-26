@@ -1,11 +1,12 @@
 <?php
 require_once __DIR__ . '/Response.php';
+require_once __DIR__ . '/../config/load_config.php';
 
 class GeminiQuizService
 {
     public static function status(): array
     {
-        $config = require __DIR__ . '/../config/config.php';
+        $config = app_config();
 
         return [
             'configured' => trim((string)($config['gemini_api_key'] ?? '')) !== '',
@@ -15,7 +16,7 @@ class GeminiQuizService
 
     public static function generate(array $input): array
     {
-        $config = require __DIR__ . '/../config/config.php';
+        $config = app_config();
         $apiKey = trim((string)($config['gemini_api_key'] ?? ''));
         $model = trim((string)($config['gemini_model'] ?? 'gemini-2.5-flash'));
 

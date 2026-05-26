@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../core/api.service';
 import { SessionService } from '../core/session.service';
 import { ToastService } from '../core/toast.service';
+import { UiService } from '../core/ui.service';
 
 @Component({
   standalone: true,
@@ -12,28 +13,28 @@ import { ToastService } from '../core/toast.service';
     <section class="page-enter" *ngIf="!session.user(); else dashboardView">
       <article class="hero-card">
         <span class="inline-tag">QuizVerse</span>
-        <h1 class="hero-title">Quizzes da comunidade, organizados para explorar e competir.</h1>
+        <h1 class="hero-title">{{ ui.t('Quizzes da comunidade, organizados para explorar e competir.', 'Community quizzes, organized for exploration and competition.') }}</h1>
         <p class="hero-copy">
-          Descobre quizzes em destaque, acompanha categorias populares e entra numa plataforma onde estudar e competir acontecem no mesmo fluxo.
+          {{ ui.t('Descobre quizzes em destaque, acompanha categorias populares e entra numa plataforma onde estudar e competir acontecem no mesmo fluxo.', 'Discover featured quizzes, follow popular categories, and use a platform where learning and competition happen in the same flow.') }}
         </p>
         <div class="hero-actions">
-          <a routerLink="/register" class="primary-button">Criar conta</a>
-          <a routerLink="/explore" class="secondary-button">Explorar quizzes</a>
+          <a routerLink="/register" class="primary-button">{{ ui.t('Criar conta', 'Create account') }}</a>
+          <a routerLink="/explore" class="secondary-button">{{ ui.t('Explorar quizzes', 'Explore quizzes') }}</a>
         </div>
         <div class="badge-row">
-          <span class="badge">{{ quizzes.length }} quizzes publicados</span>
-          <span class="badge">Ranking global em tempo real</span>
-          <span class="badge">Criacao de quizzes com IA</span>
+          <span class="badge">{{ quizzes.length }} {{ ui.t('quizzes publicados', 'published quizzes') }}</span>
+          <span class="badge">{{ ui.t('Ranking global em tempo real', 'Real-time global leaderboard') }}</span>
+          <span class="badge">{{ ui.t('Criacao de quizzes com IA', 'AI quiz creation') }}</span>
         </div>
       </article>
 
       <section class="surface-card" style="margin-top:1.25rem;">
         <div class="card-header-inline">
           <div>
-            <span class="eyebrow">Destaques</span>
-            <h2>Quizzes para comecar agora</h2>
+            <span class="eyebrow">{{ ui.t('Destaques', 'Highlights') }}</span>
+            <h2>{{ ui.t('Quizzes para comecar agora', 'Quizzes to start right now') }}</h2>
           </div>
-          <a routerLink="/explore" class="secondary-button">Ver tudo</a>
+          <a routerLink="/explore" class="secondary-button">{{ ui.t('Ver tudo', 'View all') }}</a>
         </div>
         <div class="quiz-card-grid" *ngIf="featuredQuizzes.length; else noQuizGuest">
           <article class="quiz-card" *ngFor="let quiz of featuredQuizzes">
@@ -41,24 +42,24 @@ import { ToastService } from '../core/toast.service';
             <div class="quiz-card-body">
               <div>
                 <strong>{{ quiz.title }}</strong>
-                <p class="card-description">{{ quiz.description || 'Quiz publicado pela comunidade para praticar e competir.' }}</p>
+                <p class="card-description">{{ quiz.description || ui.t('Quiz publicado pela comunidade para praticar e competir.', 'Quiz published by the community for practice and competition.') }}</p>
               </div>
               <div class="quiz-card-meta">
                 <span class="badge">{{ quiz.category }}</span>
-                <span class="badge">{{ quiz.question_count || 0 }} perguntas</span>
+                <span class="badge">{{ quiz.question_count || 0 }} {{ ui.t('perguntas', 'questions') }}</span>
               </div>
               <div class="card-footer">
                 <div class="card-footer-meta">
-                  <span class="muted">Por {{ quiz.author }}</span>
+                  <span class="muted">{{ ui.t('Por', 'By') }} {{ quiz.author }}</span>
                   <span class="muted">{{ formatPublishedAt(quiz.created_at) }}</span>
                 </div>
-                <button class="action-pill" type="button" (click)="goToLoginForQuiz()">Fazer quiz</button>
+                <button class="action-pill" type="button" (click)="goToLoginForQuiz()">{{ ui.t('Fazer quiz', 'Take quiz') }}</button>
               </div>
             </div>
           </article>
         </div>
         <ng-template #noQuizGuest>
-          <div class="empty-state">Ainda nao ha quizzes publicados.</div>
+          <div class="empty-state">{{ ui.t('Ainda nao ha quizzes publicados.', 'There are no published quizzes yet.') }}</div>
         </ng-template>
       </section>
 
@@ -66,40 +67,40 @@ import { ToastService } from '../core/toast.service';
         <article class="surface-card">
           <div class="card-header">
             <div>
-              <span class="eyebrow">Categorias</span>
-              <h2>Temas mais ativos</h2>
+              <span class="eyebrow">{{ ui.t('Categorias', 'Categories') }}</span>
+              <h2>{{ ui.t('Temas mais ativos', 'Most active topics') }}</h2>
             </div>
           </div>
           <div class="chip-grid" *ngIf="categorySummaries.length; else noCategoryGuest">
             <div class="category-chip" *ngFor="let item of categorySummaries">
               <strong>{{ item.name }}</strong>
-              <span>{{ item.count }} quizzes</span>
+              <span>{{ item.count }} {{ ui.t('quizzes', 'quizzes') }}</span>
             </div>
           </div>
           <ng-template #noCategoryGuest>
-            <div class="empty-state">As categorias vao aparecer assim que houver mais quizzes publicados.</div>
+            <div class="empty-state">{{ ui.t('As categorias vao aparecer assim que houver mais quizzes publicados.', 'Categories will appear as soon as there are more published quizzes.') }}</div>
           </ng-template>
         </article>
 
         <article class="surface-card">
           <div class="card-header">
             <div>
-              <span class="eyebrow">Como funciona</span>
-              <h2>Fluxo simples da plataforma</h2>
+              <span class="eyebrow">{{ ui.t('Como funciona', 'How it works') }}</span>
+              <h2>{{ ui.t('Fluxo simples da plataforma', 'Simple platform flow') }}</h2>
             </div>
           </div>
           <div class="feed-list">
             <article class="feed-item compact-feed-item">
-              <strong>1. Explora quizzes publicados</strong>
-              <span>Encontra temas em alta, recentes e organizados por categoria.</span>
+              <strong>{{ ui.t('1. Explora quizzes publicados', '1. Explore published quizzes') }}</strong>
+              <span>{{ ui.t('Encontra temas em alta, recentes e organizados por categoria.', 'Find trending, recent quizzes organized by category.') }}</span>
             </article>
             <article class="feed-item compact-feed-item">
-              <strong>2. Entra e participa</strong>
-              <span>As tuas pontuacoes, historico e ranking ficam ligados ao teu perfil.</span>
+              <strong>{{ ui.t('2. Entra e participa', '2. Sign in and participate') }}</strong>
+              <span>{{ ui.t('As tuas pontuacoes, historico e ranking ficam ligados ao teu perfil.', 'Your scores, history, and ranking stay connected to your profile.') }}</span>
             </article>
             <article class="feed-item compact-feed-item">
-              <strong>3. Cria com IA</strong>
-              <span>Gera novos quizzes com Gemini API e publica quando estiveres pronto.</span>
+              <strong>{{ ui.t('3. Cria com IA', '3. Create with AI') }}</strong>
+              <span>{{ ui.t('Gera novos quizzes com Gemini API e publica quando estiveres pronto.', 'Generate new quizzes with Gemini API and publish when you are ready.') }}</span>
             </article>
           </div>
         </article>
@@ -109,99 +110,99 @@ import { ToastService } from '../core/toast.service';
     <ng-template #dashboardView>
       <section class="page-enter" *ngIf="session.user()?.role === 'admin'; else playerDashboard">
         <article class="hero-card">
-          <span class="inline-tag">Administracao</span>
-          <h1 class="hero-title">Area reservada ao administrador.</h1>
-          <p class="hero-copy">O administrador gere utilizadores, relatorios e tambem pode criar quizzes para a plataforma a partir da mesma experiencia visual.</p>
+          <span class="inline-tag">{{ ui.t('Administracao', 'Administration') }}</span>
+          <h1 class="hero-title">{{ ui.t('Area reservada ao administrador.', 'Area reserved for the administrator.') }}</h1>
+          <p class="hero-copy">{{ ui.t('O administrador gere utilizadores, relatorios e tambem pode criar quizzes para a plataforma a partir da mesma experiencia visual.', 'The administrator manages users, reports, and can also create quizzes for the platform from the same visual experience.') }}</p>
           <div class="hero-actions">
-            <a routerLink="/admin" class="primary-button">Abrir dashboard</a>
-            <a routerLink="/create-quiz" class="secondary-button">Criar quiz</a>
+            <a routerLink="/admin" class="primary-button">{{ ui.t('Abrir dashboard', 'Open dashboard') }}</a>
+            <a routerLink="/create-quiz" class="secondary-button">{{ ui.t('Criar quiz', 'Create quiz') }}</a>
           </div>
         </article>
       </section>
 
       <ng-template #playerDashboard>
-      <section class="page-enter">
-        <article class="hero-card">
-          <span class="inline-tag">Dashboard pessoal</span>
-          <h1 class="hero-title">Bem-vindo, {{ session.user()?.name }}.</h1>
-          <p class="hero-copy">Explora quizzes em feed, acompanha o teu ranking e cria novos desafios com apoio de IA.</p>
-          <div class="hero-actions">
-            <a routerLink="/create-quiz" class="primary-button">Criar quiz com IA</a>
-            <a routerLink="/explore" class="secondary-button">Explorar quizzes</a>
-          </div>
-          <div class="stat-cluster">
-            <div class="stat-card"><strong>{{ profile?.stats?.best_score || 0 }}%</strong><span>Melhor score</span></div>
-            <div class="stat-card"><strong>#{{ profile?.stats?.global_rank || '-' }}</strong><span>Posicao global</span></div>
-            <div class="stat-card"><strong>{{ profile?.stats?.total_attempts || 0 }}</strong><span>Tentativas</span></div>
-          </div>
-        </article>
-
-        <section class="surface-card" style="margin-top:1.25rem;">
-          <div class="card-header-inline">
-            <div>
-              <span class="eyebrow">Feed de quizzes</span>
-              <h2>Publicado recentemente</h2>
+        <section class="page-enter">
+          <article class="hero-card">
+            <span class="inline-tag">{{ ui.t('Dashboard pessoal', 'Personal dashboard') }}</span>
+            <h1 class="hero-title">{{ ui.t('Bem-vindo,', 'Welcome,') }} {{ session.user()?.name }}.</h1>
+            <p class="hero-copy">{{ ui.t('Explora quizzes em feed, acompanha o teu ranking e cria novos desafios com apoio de IA.', 'Explore quizzes in a feed, track your ranking, and create new challenges with AI support.') }}</p>
+            <div class="hero-actions">
+              <a routerLink="/create-quiz" class="primary-button">{{ ui.t('Criar quiz com IA', 'Create quiz with AI') }}</a>
+              <a routerLink="/explore" class="secondary-button">{{ ui.t('Explorar quizzes', 'Explore quizzes') }}</a>
             </div>
-            <span class="timer-chip" *ngIf="currentQuiz">Tempo {{ timer }}s</span>
-          </div>
+            <div class="stat-cluster">
+              <div class="stat-card"><strong>{{ profile?.stats?.best_score || 0 }}%</strong><span>{{ ui.t('Melhor score', 'Best score') }}</span></div>
+              <div class="stat-card"><strong>#{{ profile?.stats?.global_rank || '-' }}</strong><span>{{ ui.t('Posicao global', 'Global rank') }}</span></div>
+              <div class="stat-card"><strong>{{ profile?.stats?.total_attempts || 0 }}</strong><span>{{ ui.t('Tentativas', 'Attempts') }}</span></div>
+            </div>
+          </article>
 
-          <div class="quiz-card-grid" *ngIf="!currentQuiz && featuredQuizzes.length; else quizStageOrEmpty">
-            <article class="quiz-card" *ngFor="let quiz of featuredQuizzes">
-              <img class="quiz-card-image" [src]="quizImage(quiz)" [alt]="quiz.title">
-              <div class="quiz-card-body">
-                <div>
-                  <strong>{{ quiz.title }}</strong>
-                  <p class="card-description">{{ quiz.description || 'Quiz pronto para jogar e somar pontos no ranking.' }}</p>
-                </div>
-                <div class="quiz-card-meta">
-                  <span class="badge">{{ quiz.category }}</span>
-                  <span class="badge">{{ quiz.question_count || 0 }} perguntas</span>
-                </div>
-                <div class="card-footer">
-                  <div class="card-footer-meta">
-                    <span class="muted">Por {{ quiz.author }}</span>
-                    <span class="muted">{{ formatPublishedAt(quiz.created_at) }}</span>
-                  </div>
-                  <button class="action-pill" type="button" (click)="start(quiz.id)">Iniciar quiz</button>
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <ng-template #quizStageOrEmpty>
-            <div class="empty-state" *ngIf="!currentQuiz && !featuredQuizzes.length">Nao existem quizzes publicados.</div>
-            <article class="quiz-stage" *ngIf="currentQuiz">
+          <section class="surface-card" style="margin-top:1.25rem;">
+            <div class="card-header-inline">
               <div>
-                <div class="card-header-inline">
+                <span class="eyebrow">{{ ui.t('Feed de quizzes', 'Quiz feed') }}</span>
+                <h2>{{ ui.t('Publicado recentemente', 'Recently published') }}</h2>
+              </div>
+              <span class="timer-chip" *ngIf="currentQuiz">{{ ui.t('Tempo', 'Time') }} {{ timer }}s</span>
+            </div>
+
+            <div class="quiz-card-grid" *ngIf="!currentQuiz && featuredQuizzes.length; else quizStageOrEmpty">
+              <article class="quiz-card" *ngFor="let quiz of featuredQuizzes">
+                <img class="quiz-card-image" [src]="quizImage(quiz)" [alt]="quiz.title">
+                <div class="quiz-card-body">
                   <div>
-                    <span class="eyebrow">{{ currentQuiz.category }}</span>
-                    <h2>{{ currentQuiz.title }}</h2>
+                    <strong>{{ quiz.title }}</strong>
+                    <p class="card-description">{{ quiz.description || ui.t('Quiz pronto para jogar e somar pontos no ranking.', 'Quiz ready to play and earn ranking points.') }}</p>
                   </div>
-                  <span class="pill-status" [class.status-warning]="timer <= 15" [class.status-success]="timer > 15">{{ answeredCount }}/{{ totalQuestions }} respondidas</span>
+                  <div class="quiz-card-meta">
+                    <span class="badge">{{ quiz.category }}</span>
+                    <span class="badge">{{ quiz.question_count || 0 }} {{ ui.t('perguntas', 'questions') }}</span>
+                  </div>
+                  <div class="card-footer">
+                    <div class="card-footer-meta">
+                      <span class="muted">{{ ui.t('Por', 'By') }} {{ quiz.author }}</span>
+                      <span class="muted">{{ formatPublishedAt(quiz.created_at) }}</span>
+                    </div>
+                    <button class="action-pill" type="button" (click)="start(quiz.id)">{{ ui.t('Iniciar quiz', 'Start quiz') }}</button>
+                  </div>
                 </div>
-                <div class="progress-shell"><div class="progress-bar" [style.width.%]="progress"></div></div>
-              </div>
+              </article>
+            </div>
 
-              <div class="question-card" *ngFor="let question of currentQuiz.questions; let i = index">
-                <strong>{{ i + 1 }}. {{ question.question_text }}</strong>
-                <div class="list-stack" style="margin-top:0.9rem;">
-                  <label class="answer-choice" *ngFor="let option of question.options" [class.active]="answers[question.id] === option.id">
-                    <input type="radio" [name]="'q' + question.id" [checked]="answers[question.id] === option.id" (change)="selectOption(question.id, option.id)">
-                    <span>{{ option.option_text }}</span>
-                  </label>
+            <ng-template #quizStageOrEmpty>
+              <div class="empty-state" *ngIf="!currentQuiz && !featuredQuizzes.length">{{ ui.t('Nao existem quizzes publicados.', 'There are no published quizzes.') }}</div>
+              <article class="quiz-stage" *ngIf="currentQuiz">
+                <div>
+                  <div class="card-header-inline">
+                    <div>
+                      <span class="eyebrow">{{ currentQuiz.category }}</span>
+                      <h2>{{ currentQuiz.title }}</h2>
+                    </div>
+                    <span class="pill-status" [class.status-warning]="timer <= 15" [class.status-success]="timer > 15">{{ answeredCount }}/{{ totalQuestions }} {{ ui.t('respondidas', 'answered') }}</span>
+                  </div>
+                  <div class="progress-shell"><div class="progress-bar" [style.width.%]="progress"></div></div>
                 </div>
-              </div>
 
-              <button class="primary-button" type="button" (click)="submit()">Submeter respostas</button>
-              <div class="result-banner" *ngIf="result">
-                <span class="eyebrow">Resultado</span>
-                <strong>{{ result.score }}%</strong>
-                <span>Acertaste {{ result.correct_answers }} de {{ result.total_questions }} perguntas.</span>
-              </div>
-            </article>
-          </ng-template>
+                <div class="question-card" *ngFor="let question of currentQuiz.questions; let i = index">
+                  <strong>{{ i + 1 }}. {{ question.question_text }}</strong>
+                  <div class="list-stack" style="margin-top:0.9rem;">
+                    <label class="answer-choice" *ngFor="let option of question.options" [class.active]="answers[question.id] === option.id">
+                      <input type="radio" [name]="'q' + question.id" [checked]="answers[question.id] === option.id" (change)="selectOption(question.id, option.id)">
+                      <span>{{ option.option_text }}</span>
+                    </label>
+                  </div>
+                </div>
+
+                <button class="primary-button" type="button" (click)="submit()">{{ ui.t('Submeter respostas', 'Submit answers') }}</button>
+                <div class="result-banner" *ngIf="result">
+                  <span class="eyebrow">{{ ui.t('Resultado', 'Result') }}</span>
+                  <strong>{{ result.score }}%</strong>
+                  <span>{{ ui.t('Acertaste', 'You got') }} {{ result.correct_answers }} {{ ui.t('de', 'out of') }} {{ result.total_questions }} {{ ui.t('perguntas.', 'questions.') }}</span>
+                </div>
+              </article>
+            </ng-template>
+          </section>
         </section>
-      </section>
       </ng-template>
     </ng-template>
   `
@@ -212,6 +213,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
   readonly toast = inject(ToastService);
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
+  readonly ui = inject(UiService);
 
   quizzes: any[] = [];
   ranking: any[] = [];
@@ -262,7 +264,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
   get categorySummaries() {
     const map = new Map<string, number>();
     for (const quiz of this.quizzes) {
-      const key = quiz.category || 'Geral';
+      const key = quiz.category || this.ui.t('Conhecimento geral', 'General knowledge');
       map.set(key, (map.get(key) || 0) + 1);
     }
 
@@ -280,10 +282,10 @@ export class HomePageComponent implements OnInit, OnDestroy {
 
   formatPublishedAt(value: string) {
     if (!value) {
-      return 'Agora mesmo';
+      return this.ui.t('Agora mesmo', 'Just now');
     }
 
-    return new Date(value).toLocaleString('pt-PT', {
+    return new Date(value).toLocaleString(this.ui.locale(), {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -301,7 +303,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
           this.pendingQuizId = null;
         }
       },
-      error: () => this.toast.error('Conexao perdida', 'Nao foi possivel carregar os quizzes.')
+      error: () => this.toast.error(this.ui.t('Conexao perdida', 'Connection lost'), this.ui.t('Nao foi possivel carregar os quizzes.', 'Could not load the quizzes.'))
     });
   }
 
@@ -311,7 +313,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
   }
 
   goToLoginForQuiz() {
-    this.toast.info('Login necessario', 'Entra primeiro para responder a este quiz.');
+    this.toast.info(this.ui.t('Login necessario', 'Login required'), this.ui.t('Entra primeiro para responder a este quiz.', 'Sign in first to answer this quiz.'));
     this.router.navigateByUrl('/login');
   }
 
@@ -323,9 +325,9 @@ export class HomePageComponent implements OnInit, OnDestroy {
         this.currentQuiz = response.quiz;
         this.timer = Math.max(30, (this.currentQuiz.questions?.length || 1) * 20);
         this.startTimer();
-        this.toast.info('Quiz iniciado', 'Boa sorte. O tempo ja comecou a contar.');
+        this.toast.info(this.ui.t('Quiz iniciado', 'Quiz started'), this.ui.t('Boa sorte. O tempo ja comecou a contar.', 'Good luck. The timer has already started.'));
       },
-      error: () => this.toast.error('Erro', 'Nao foi possivel abrir o quiz selecionado.')
+      error: () => this.toast.error(this.ui.t('Erro', 'Error'), this.ui.t('Nao foi possivel abrir o quiz selecionado.', 'Could not open the selected quiz.'))
     });
   }
 
@@ -342,10 +344,10 @@ export class HomePageComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.result = response.result;
         this.stopTimer();
-        this.toast.success('Quiz concluido', 'Pontuacao registada com sucesso.');
+        this.toast.success(this.ui.t('Quiz concluido', 'Quiz completed'), this.ui.t('Pontuacao registada com sucesso.', 'Score recorded successfully.'));
         this.loadPrivateData();
       },
-      error: () => this.toast.error('Falha ao submeter', 'Verifica a ligacao e tenta novamente.')
+      error: () => this.toast.error(this.ui.t('Falha ao submeter', 'Failed to submit'), this.ui.t('Verifica a ligacao e tenta novamente.', 'Check your connection and try again.'))
     });
   }
 
@@ -355,7 +357,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
       this.timer -= 1;
       if (this.timer <= 0) {
         this.stopTimer();
-        this.toast.warning('Tempo esgotado', 'O quiz foi submetido automaticamente.');
+        this.toast.warning(this.ui.t('Tempo esgotado', 'Time is up'), this.ui.t('O quiz foi submetido automaticamente.', 'The quiz was submitted automatically.'));
         this.submit();
       }
     }, 1000);

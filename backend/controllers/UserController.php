@@ -41,8 +41,8 @@ class UserController
             'profile' => $user,
             'stats' => [
                 'total_attempts' => (int)$summary['total_attempts'],
-                'best_score' => (int)$summary['best_score'],
-                'avg_score' => round((float)$summary['avg_score'], 2),
+                'best_score' => round((float)$summary['best_score'], 4),
+                'avg_score' => round((float)$summary['avg_score'], 4),
                 'global_rank' => (int)($rank['rank_position'] ?? 0)
             ]
         ]);
@@ -68,9 +68,9 @@ class UserController
         foreach ($rows as $index => $row) {
             $row['position'] = $index + 1;
             $row['attempts'] = (int)$row['attempts'];
-            $row['total_score'] = (int)$row['total_score'];
-            $row['best_score'] = (int)$row['best_score'];
-            $row['avg_score'] = round((float)$row['avg_score'], 2);
+            $row['total_score'] = round((float)$row['total_score'], 4);
+            $row['best_score'] = round((float)$row['best_score'], 4);
+            $row['avg_score'] = round((float)$row['avg_score'], 4);
             $ranked[] = $row;
         }
 

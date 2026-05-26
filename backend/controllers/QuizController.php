@@ -111,16 +111,19 @@ class QuizController
             }
         }
 
-        $score = (int)round(($correct / $total) * 100);
+        $timeTaken = max(1, (int)(Request::body()['time_taken'] ?? 1));
+        $basePoints = $correct * (10.0 / $total);
+        $score = round($basePoints / $timeTaken, 4);
 
-        $insert = $db->prepare('INSERT INTO quiz_attempts (quiz_id, user_id, total_questions, correct_answers, score) VALUES (?, ?, ?, ?, ?)');
-        $insert->execute([$quizId, $userId, $total, $correct, $score]);
+        $insert = $db->prepare('INSERT INTO quiz_attempts (quiz_id, user_id, total_questions, correct_answers, score, time_taken) VALUES (?, ?, ?, ?, ?, ?)');
+        $insert->execute([$quizId, $userId, $total, $correct, $score, $timeTaken]);
 
         Response::json([
             'result' => [
                 'score' => $score,
                 'correct_answers' => $correct,
-                'total_questions' => $total
+                'total_questions' => $total,
+                'time_taken' => $timeTaken
             ]
         ]);
     }

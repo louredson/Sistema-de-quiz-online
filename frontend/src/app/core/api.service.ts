@@ -15,7 +15,7 @@ export class ApiService {
   triviaCategories() { return this.http.get<any>(`${this.base}/trivia/categories`); }
   quizzes() { return this.http.get<any>(`${this.base}/quizzes`); }
   quiz(id: number) { return this.http.get<any>(`${this.base}/quizzes/${id}`); }
-  submit(id: number, answers: any) { return this.http.post<any>(`${this.base}/quizzes/${id}/submit`, { answers }); }
+  submit(id: number, answers: any, timeTaken?: number) { return this.http.post<any>(`${this.base}/quizzes/${id}/submit`, { answers, time_taken: timeTaken }); }
   createQuiz(data: any) { return this.http.post<any>(`${this.base}/quizzes`, data); }
   importQuiz(data: any) { return this.http.post<any>(`${this.base}/quizzes/import`, data); }
   generateAiQuiz(data: any) { return this.http.post<any>(`${this.base}/quizzes/generate-ai`, data); }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../core/api.service';
 import { ToastService } from '../core/toast.service';
+import { UiService } from '../core/ui.service';
 
 @Component({
   standalone: true,
@@ -12,16 +13,16 @@ import { ToastService } from '../core/toast.service';
     <section class="page-enter">
       <article class="hero-card">
         <span class="inline-tag">Dashboard</span>
-        <h1 class="hero-title">Gestao completa da plataforma QuizVerse.</h1>
-        <p class="hero-copy">Aqui acompanhas utilizadores, relatorios e quizzes publicados num layout mais responsivo, sem separar a experiencia do resto da aplicacao.</p>
+        <h1 class="hero-title">{{ ui.t('Gestao completa da plataforma QuizVerse.', 'Complete QuizVerse platform management.') }}</h1>
+        <p class="hero-copy">{{ ui.t('Aqui acompanhas utilizadores, relatorios e quizzes publicados num layout mais responsivo, sem separar a experiencia do resto da aplicacao.', 'Here you track users, reports, and published quizzes in a responsive layout without separating the experience from the rest of the app.') }}</p>
         <div class="hero-actions">
-          <a routerLink="/create-quiz" class="primary-button">Criar quiz</a>
-          <a routerLink="/explore" class="secondary-button">Explorar quizzes</a>
+          <a routerLink="/create-quiz" class="primary-button">{{ ui.t('Criar quiz', 'Create quiz') }}</a>
+          <a routerLink="/explore" class="secondary-button">{{ ui.t('Explorar quizzes', 'Explore quizzes') }}</a>
         </div>
         <div class="stat-cluster">
-          <div class="stat-card"><strong>{{ summary.users }}</strong><span>Total de users</span></div>
-          <div class="stat-card"><strong>{{ summary.quizzes }}</strong><span>Total de quizzes</span></div>
-          <div class="stat-card"><strong>{{ bestScorer.name || 'Sem dados' }}</strong><span>Melhor pontuador</span></div>
+          <div class="stat-card"><strong>{{ summary.users }}</strong><span>{{ ui.t('Total de utilizadores', 'Total users') }}</span></div>
+          <div class="stat-card"><strong>{{ summary.quizzes }}</strong><span>{{ ui.t('Total de quizzes', 'Total quizzes') }}</span></div>
+          <div class="stat-card"><strong>{{ bestScorer.name || ui.t('Sem dados', 'No data') }}</strong><span>{{ ui.t('Melhor pontuador', 'Top scorer') }}</span></div>
         </div>
       </article>
 
@@ -29,16 +30,16 @@ import { ToastService } from '../core/toast.service';
         <article class="surface-card">
           <div class="card-header-inline">
             <div>
-              <span class="eyebrow">Quizzes publicados</span>
-              <h2>Catalogo da plataforma</h2>
+              <span class="eyebrow">{{ ui.t('Quizzes publicados', 'Published quizzes') }}</span>
+              <h2>{{ ui.t('Catalogo da plataforma', 'Platform catalog') }}</h2>
             </div>
-            <span class="pill-status status-success">{{ filteredQuizzes.length }} visiveis</span>
+            <span class="pill-status status-success">{{ filteredQuizzes.length }} {{ ui.t('visiveis', 'visible') }}</span>
           </div>
           <div class="filter-row" style="margin-bottom:1rem;">
             <div style="flex:1; min-width:220px;">
-              <label class="field-label">Filtrar por categoria</label>
+              <label class="field-label">{{ ui.t('Filtrar por categoria', 'Filter by category') }}</label>
               <select [(ngModel)]="selectedCategory">
-                <option value="">Todas</option>
+                <option value="">{{ ui.t('Todas', 'All') }}</option>
                 <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
               </select>
             </div>
@@ -49,40 +50,40 @@ import { ToastService } from '../core/toast.service';
               <div class="quiz-card-body">
                 <div>
                   <strong>{{ quiz.title }}</strong>
-                  <p class="card-description">{{ quiz.description || 'Quiz publicado na plataforma.' }}</p>
+                  <p class="card-description">{{ quiz.description || ui.t('Quiz publicado na plataforma.', 'Quiz published on the platform.') }}</p>
                 </div>
                 <div class="quiz-card-meta">
                   <span class="badge">{{ quiz.category }}</span>
-                  <span class="badge">{{ quiz.question_count || 0 }} perguntas</span>
+                  <span class="badge">{{ quiz.question_count || 0 }} {{ ui.t('perguntas', 'questions') }}</span>
                 </div>
                 <div class="card-footer">
                   <div class="card-footer-meta">
-                    <span class="muted">Por {{ quiz.author }}</span>
+                    <span class="muted">{{ ui.t('Por', 'By') }} {{ quiz.author }}</span>
                     <span class="muted">{{ formatPublishedAt(quiz.created_at) }}</span>
                   </div>
                 </div>
               </div>
             </article>
           </div>
-          <ng-template #noQuizzes><div class="empty-state">Sem quizzes publicados para mostrar.</div></ng-template>
+          <ng-template #noQuizzes><div class="empty-state">{{ ui.t('Sem quizzes publicados para mostrar.', 'No published quizzes to show.') }}</div></ng-template>
         </article>
 
         <article class="table-card">
           <div class="card-header-inline">
             <div>
-              <span class="eyebrow">Users management</span>
-              <h2>Bloquear e desbloquear utilizadores</h2>
+              <span class="eyebrow">{{ ui.t('Gestao de utilizadores', 'User management') }}</span>
+              <h2>{{ ui.t('Bloquear e desbloquear utilizadores', 'Block and unblock users') }}</h2>
             </div>
-            <span class="pill-status status-success">{{ users.length }} contas</span>
+            <span class="pill-status status-success">{{ users.length }} {{ ui.t('contas', 'accounts') }}</span>
           </div>
           <div class="table-wrap">
             <table class="table-modern" *ngIf="users.length; else noUsers">
               <thead>
                 <tr>
-                  <th>Nome</th>
+                  <th>{{ ui.t('Nome', 'Name') }}</th>
                   <th>Email</th>
-                  <th>Estado</th>
-                  <th>Acao</th>
+                  <th>{{ ui.t('Estado', 'Status') }}</th>
+                  <th>{{ ui.t('Acao', 'Action') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -91,35 +92,35 @@ import { ToastService } from '../core/toast.service';
                   <td>{{ user.email }}</td>
                   <td>
                     <span class="pill-status" [class.status-success]="user.status === 'active'" [class.status-danger]="user.status !== 'active'">
-                      {{ user.status === 'active' ? 'ativo' : 'bloqueado' }}
+                      {{ user.status === 'active' ? ui.t('Ativo', 'Active') : ui.t('Bloqueado', 'Blocked') }}
                     </span>
                   </td>
                   <td>
                     <button class="secondary-button" type="button" (click)="toggleUser(user)">
-                      {{ user.status === 'active' ? 'Bloquear' : 'Desbloquear' }}
+                      {{ user.status === 'active' ? ui.t('Bloquear', 'Block') : ui.t('Desbloquear', 'Unblock') }}
                     </button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <ng-template #noUsers><div class="empty-state">Sem utilizadores encontrados.</div></ng-template>
+          <ng-template #noUsers><div class="empty-state">{{ ui.t('Sem utilizadores encontrados.', 'No users found.') }}</div></ng-template>
         </article>
 
         <article class="table-card">
           <div class="card-header-inline">
             <div>
-              <span class="eyebrow">System report</span>
-              <h2>Gerar relatorio PDF</h2>
+              <span class="eyebrow">{{ ui.t('Relatorio do sistema', 'System report') }}</span>
+              <h2>{{ ui.t('Gerar relatorio PDF', 'Generate PDF report') }}</h2>
             </div>
           </div>
           <div class="form-stack">
-            <p class="helper-copy">O relatorio inclui total de users, total de quizzes, melhor pontuador, data de emissao e ranking geral limitado pelo numero de participantes escolhido.</p>
+            <p class="helper-copy">{{ ui.t('O relatorio inclui total de utilizadores, total de quizzes, melhor pontuador, data de emissao e ranking geral limitado pelo numero de participantes escolhido.', 'The report includes total users, total quizzes, top scorer, issue date, and a general ranking limited by the chosen number of participants.') }}</p>
             <div>
-              <label class="field-label">Numero de participantes no ranking impresso</label>
+              <label class="field-label">{{ ui.t('Numero de participantes no ranking impresso', 'Number of participants in the printed ranking') }}</label>
               <input type="number" min="1" max="100" [(ngModel)]="participants">
             </div>
-            <button class="primary-button" type="button" (click)="downloadReport()">Gerar PDF</button>
+            <button class="primary-button" type="button" (click)="downloadReport()">{{ ui.t('Gerar PDF', 'Generate PDF') }}</button>
           </div>
         </article>
       </section>
@@ -133,6 +134,7 @@ export class AdminPageComponent {
   bestScorer: any = { name: 'Sem dados' };
   participants = 10;
   selectedCategory = '';
+  readonly ui = inject(UiService);
   private readonly api = inject(ApiService);
   private readonly toast = inject(ToastService);
 
@@ -143,11 +145,11 @@ export class AdminPageComponent {
   }
 
   get categories() {
-    return Array.from(new Set(this.quizzes.map((quiz) => quiz.category || 'Geral'))).sort();
+    return Array.from(new Set(this.quizzes.map((quiz) => quiz.category || this.ui.t('Conhecimento geral', 'General knowledge')))).sort();
   }
 
   get filteredQuizzes() {
-    return this.quizzes.filter((quiz) => !this.selectedCategory || (quiz.category || 'Geral') === this.selectedCategory);
+    return this.quizzes.filter((quiz) => !this.selectedCategory || (quiz.category || this.ui.t('Conhecimento geral', 'General knowledge')) === this.selectedCategory);
   }
 
   loadDashboard() {
@@ -157,9 +159,9 @@ export class AdminPageComponent {
           users: response.summary?.users || 0,
           quizzes: response.summary?.quizzes || 0
         };
-        this.bestScorer = response.best_scorer || { name: 'Sem dados' };
+        this.bestScorer = response.best_scorer || { name: this.ui.t('Sem dados', 'No data') };
       },
-      error: () => this.toast.error('Erro', 'Nao foi possivel carregar o painel administrativo.')
+      error: () => this.toast.error(this.ui.t('Erro', 'Error'), this.ui.t('Nao foi possivel carregar o painel administrativo.', 'Could not load the administrative dashboard.'))
     });
   }
 
@@ -168,14 +170,14 @@ export class AdminPageComponent {
       next: (response) => {
         this.users = (response.users || []).filter((user: any) => user.role === 'user');
       },
-      error: () => this.toast.error('Erro', 'Nao foi possivel carregar os utilizadores.')
+      error: () => this.toast.error(this.ui.t('Erro', 'Error'), this.ui.t('Nao foi possivel carregar os utilizadores.', 'Could not load users.'))
     });
   }
 
   loadQuizzes() {
     this.api.quizzes().subscribe({
       next: (response) => this.quizzes = response.quizzes || [],
-      error: () => this.toast.error('Erro', 'Nao foi possivel carregar os quizzes publicados.')
+      error: () => this.toast.error(this.ui.t('Erro', 'Error'), this.ui.t('Nao foi possivel carregar os quizzes publicados.', 'Could not load published quizzes.'))
     });
   }
 
@@ -183,11 +185,11 @@ export class AdminPageComponent {
     const nextStatus = user.status === 'active' ? 'inactive' : 'active';
     this.api.updateAdminUser(user.id, { status: nextStatus }).subscribe({
       next: () => {
-        this.toast.success('Utilizador atualizado', nextStatus === 'inactive' ? 'Conta bloqueada com sucesso.' : 'Conta desbloqueada com sucesso.');
+        this.toast.success(this.ui.t('Utilizador atualizado', 'User updated'), nextStatus === 'inactive' ? this.ui.t('Conta bloqueada com sucesso.', 'Account blocked successfully.') : this.ui.t('Conta desbloqueada com sucesso.', 'Account unblocked successfully.'));
         this.loadUsers();
         this.loadDashboard();
       },
-      error: (e) => this.toast.error('Falha na atualizacao', e.error?.message || 'Nao foi possivel atualizar o utilizador.')
+      error: (e) => this.toast.error(this.ui.t('Falha na atualizacao', 'Update failed'), e.error?.message || this.ui.t('Nao foi possivel atualizar o utilizador.', 'Could not update the user.'))
     });
   }
 
@@ -197,12 +199,12 @@ export class AdminPageComponent {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `quizverse-relatorio-${new Date().toISOString().slice(0, 10)}.pdf`;
+        a.download = `quizverse-report-${new Date().toISOString().slice(0, 10)}.pdf`;
         a.click();
         window.URL.revokeObjectURL(url);
-        this.toast.success('Relatorio gerado', 'O PDF do sistema foi descarregado com sucesso.');
+        this.toast.success(this.ui.t('Relatorio gerado', 'Report generated'), this.ui.t('O PDF do sistema foi descarregado com sucesso.', 'The system PDF was downloaded successfully.'));
       },
-      error: () => this.toast.error('Falha ao gerar PDF', 'Nao foi possivel emitir o relatorio do sistema.')
+      error: () => this.toast.error(this.ui.t('Falha ao gerar PDF', 'Failed to generate PDF'), this.ui.t('Nao foi possivel emitir o relatorio do sistema.', 'Could not generate the system report.'))
     });
   }
 
@@ -214,10 +216,10 @@ export class AdminPageComponent {
 
   formatPublishedAt(value: string) {
     if (!value) {
-      return 'Agora mesmo';
+      return this.ui.t('Agora mesmo', 'Just now');
     }
 
-    return new Date(value).toLocaleString('pt-PT', {
+    return new Date(value).toLocaleString(this.ui.locale(), {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

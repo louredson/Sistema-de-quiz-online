@@ -9,6 +9,10 @@ export class UiService {
     return this.lang() === 'pt' ? pt : en;
   }
 
+  locale(): string {
+    return this.lang() === 'pt' ? 'pt-PT' : 'en-US';
+  }
+
   setLang(lang: 'pt' | 'en') {
     this.lang.set(lang);
     localStorage.setItem('lang', lang);

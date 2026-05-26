@@ -1,9 +1,11 @@
 <?php
+require_once __DIR__ . '/../config/load_config.php';
+
 class Jwt
 {
     public static function encode(array $payload): string
     {
-        $config = require __DIR__ . '/../config/config.php';
+        $config = app_config();
         $header = self::base64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
         $payload['iss'] = $config['jwt_issuer'];
         $payload['iat'] = time();
@@ -15,7 +17,7 @@ class Jwt
 
     public static function decode(string $token): ?array
     {
-        $config = require __DIR__ . '/../config/config.php';
+        $config = app_config();
         $parts = explode('.', $token);
         if (count($parts) !== 3) {
             return null;

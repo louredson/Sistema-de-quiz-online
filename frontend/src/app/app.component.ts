@@ -17,34 +17,34 @@ import { UiService } from './core/ui.service';
           <span class="brand-mark"><img src="assets/favicon.svg" alt="QuizVerse"></span>
           <span class="brand-copy topbar-brand-copy">
             <strong>QuizVerse</strong>
-            <span>Smart quiz platform</span>
+            <span>{{ ui.t('Plataforma inteligente de quizzes', 'Smart quiz platform') }}</span>
           </span>
         </a>
 
         <nav class="topbar-nav">
-          <a routerLink="/">Home</a>
-          <a routerLink="/explore">Explorar</a>
-          <a *ngIf="session.user()" routerLink="/create-quiz">Criar</a>
-          <a *ngIf="session.user()?.role === 'user'" routerLink="/ranking">Ranking</a>
+          <a routerLink="/">{{ ui.t('Inicio', 'Home') }}</a>
+          <a routerLink="/explore">{{ ui.t('Explorar', 'Explore') }}</a>
+          <a *ngIf="session.user()" routerLink="/create-quiz">{{ ui.t('Criar', 'Create') }}</a>
+          <a *ngIf="session.user()?.role === 'user'" routerLink="/ranking">{{ ui.t('Ranking', 'Leaderboard') }}</a>
           <a *ngIf="session.user()?.role === 'admin'" routerLink="/admin">Dashboard</a>
         </nav>
       </div>
 
       <div class="topbar-right">
-        <button class="icon-button" type="button" (click)="ui.toggleTheme()">{{ ui.theme() === 'light' ? 'Dark' : 'Light' }}</button>
+        <button class="icon-button" type="button" (click)="ui.toggleTheme()">{{ ui.theme() === 'light' ? ui.t('Escuro', 'Dark') : ui.t('Claro', 'Light') }}</button>
         <button class="icon-button" type="button" (click)="switchLang()">{{ ui.lang() === 'pt' ? 'EN' : 'PT' }}</button>
         <div class="user-chip" *ngIf="session.user(); else authButtons">
           <div class="avatar">{{ initials }}</div>
           <div class="user-meta">
             <strong>{{ session.user()?.name }}</strong>
-            <span>{{ session.user()?.role === 'admin' ? 'Administrator' : 'Player' }}</span>
+            <span>{{ session.user()?.role === 'admin' ? ui.t('Administrador', 'Administrator') : ui.t('Jogador', 'Player') }}</span>
           </div>
-          <button class="ghost-button" type="button" (click)="logout()">Logout</button>
+          <button class="ghost-button" type="button" (click)="logout()">{{ ui.t('Sair', 'Logout') }}</button>
         </div>
         <ng-template #authButtons>
           <div class="auth-actions">
             <button class="primary-button topbar-cta" type="button" (click)="go('/login')">Login</button>
-            <button class="primary-button topbar-cta" type="button" (click)="go('/register')">Criar conta</button>
+            <button class="primary-button topbar-cta" type="button" (click)="go('/register')">{{ ui.t('Criar conta', 'Create account') }}</button>
           </div>
         </ng-template>
       </div>
@@ -62,13 +62,13 @@ import { UiService } from './core/ui.service';
           <span class="brand-mark"><img src="assets/favicon.svg" alt="QuizVerse"></span>
           <div class="brand-copy">
             <strong>QuizVerse</strong>
-            <span>Explora quizzes, cria conteudo com IA e acompanha rankings em tempo real.</span>
+            <span>{{ ui.t('Explora quizzes, cria conteudo com IA e acompanha rankings em tempo real.', 'Explore quizzes, create AI content, and track rankings in real time.') }}</span>
           </div>
         </div>
 
         <div class="footer-links">
           <span>Angular + PHP + MySQL</span>
-          <span>Gemini-ready quiz generation</span>
+          <span>{{ ui.t('Geracao de quizzes com Gemini', 'Gemini-ready quiz generation') }}</span>
           <span>PT / EN</span>
         </div>
       </div>

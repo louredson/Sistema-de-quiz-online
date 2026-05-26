@@ -5,6 +5,6 @@
  * (a chave anterior foi revogada por estar exposta publicamente).
  */
 return [
-    'gemini_api_key' => 'AIzaSyBzAQZvO453zyJv_KydW74_H2SuP8_iBgg',
+    'gemini_api_key' => 'AIzaSyBYdFw10iSDi2irQe3A4TIUT_KuT9SpJqE',
     'gemini_model' => 'gemini-2.5-flash'
 ];
